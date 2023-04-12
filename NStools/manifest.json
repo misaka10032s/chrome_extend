@@ -1,0 +1,24 @@
+{
+    "name": "NS工具包",
+    "version": "1.0.0",
+    "description": "NS kit tools",
+    "manifest_version": 3,
+    "author": "misaka10032s",
+    "background":{
+        "service_worker": "NStools_background.js",
+        "type": "module"
+    },
+    "permissions": [
+        "activeTab",
+        "contextMenus",
+        "tabs",
+        "scripting"
+    ],
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "action": {
+        "default_popup": "tool_index.html"
+    }
+}
