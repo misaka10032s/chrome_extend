@@ -1,107 +1,18 @@
-import { navigation } from "./js/navigation.js";
-import { search_saucenao } from "./js/image-saucenao.js";
-import { search_ascii2d } from "./js/image-ascii2d.js";
-// @@@@test
-import { gogo } from "./js/test.js";
-
-// ########################################################
-// ####################### variables ######################
-// ########################################################
-
-// tabs to execute script after status is complete
-// tabId: string for js file, function for executeScript
-export const tabStore = {};
+import { contextMenus } from "./js/setting.js";
+import { executeScript, getDomain, executeStoreScript, injectScript } from "./js/methods.js";
+import { tabStore } from "./js/store.js";
+import { _initSwal } from "./js/sweetalert2@11.js";
 
 // ########################################################
 // ######################### menus ########################
 // ########################################################
-// normal
-chrome.contextMenus.create({
-    id: "reload_image",
-    type: "normal",
-    title: "重載失敗圖片",
-    contexts: ["page"],
-});
-chrome.contextMenus.create({
-    id: "anit-white",
-    type: "normal",
-    title: "解除反白限制",
-    contexts: ["page"],
-});
-
-// selection
-chrome.contextMenus.create({
-    id: "navigation",
-    type: "normal",
-    title: "goto: %s",
-    contexts: ["selection"],
-});
-chrome.contextMenus.create({
-    // @@@@test
-    id: "test",
-    type: "normal",
-    title: "test: %s",
-    contexts: ["selection"],
-});
-
-// image
-chrome.contextMenus.create({
-    id: "image-saucenao",
-    type: "normal",
-    title: "search image at saucenao", // https://saucenao.com
-    contexts: ["image"],
-});
-chrome.contextMenus.create({
-    id: "image-ascii2d",
-    type: "normal",
-    title: "search image at ascii2d", // https://ascii2d.net
-    contexts: ["image"],
-});
-
-// ########################################################
-// ######################## methods #######################
-// ########################################################
-const createNewTab = async (url, scriptName, ...args) => {
-    chrome.tabs.create({
-        url: url,
-    }, async tab => {
-        console.log("image tab: ", tab, url);
-        if(scriptName) await executeScript(tab.id, scriptName, ...args);
+for (const [key, value] of Object.entries(contextMenus)) {
+    chrome.contextMenus.create({
+        id: key,
+        type: value.type ?? "normal",
+        title: value.title,
+        contexts: value.contexts,
     });
-}
-
-const executeScript = async (tabId, file, ...args) => {
-    if (tabId == "current") {
-        const [tab] = await chrome.tabs.query({
-            active: true,
-            currentWindow: true
-        });
-        // console.log("executeScript: ", tabId, tab);
-        tabId = tab.id;
-        if(!tab.url.match("^http")){
-            return;
-        }
-    }
-    // if file is string, execute file
-    if(typeof file == "string"){
-        await chrome.scripting.executeScript({
-            target: {
-                tabId: tabId
-            },
-            files: [`js/${ file }`],
-            // files: [`chrome-extension://${ chrome.runtime.id }/js/${ file }`],
-        });
-    }
-    // if file is function, execute function
-    else if(typeof file == "function"){
-        await chrome.scripting.executeScript({
-            target: {
-                tabId: tabId
-            },
-            func: file,
-            args: args,
-        });
-    }
 }
 
 // ########################################################
@@ -112,55 +23,48 @@ chrome.contextMenus.onClicked.addListener(
     async (info, tab) => {
         console.log("info: ", info);
         console.log("tab: ", tab);
-        switch(info.menuItemId){
-            case "reload_image":
-                await executeScript("current", "reload_image.js");
-                break;
-            case "anit-white":
-                await executeScript("current", "anti-white.js");
-                break;
-            case "navigation":
-                console.log(chrome.windows, chrome.windows.WINDOW_ID_CURRENT, await chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT}));
-                await executeScript("current", navigation, info.selectionText);
-                // navigation(info.selectionText);
-                break;
-            case "image-saucenao":
-                createNewTab("https://saucenao.com", search_saucenao, info.srcUrl);
-                break;
-            case "image-ascii2d":
-                createNewTab("https://ascii2d.net", search_ascii2d, info.srcUrl);
-                break;
-
-            // @@@@test
-            case "test":
-                console.log("test: ", info.selectionText);
-                var res = await chrome.scripting.executeScript({
-                    target: {
-                        tabId: tab.id
-                    },
-                    func: gogo
-                });
-                console.log("res: ", res);
-                break;
+        if(info.menuItemId in contextMenus){
+            await contextMenus[info.menuItemId].script(info, tab);
         }
 });
 
 // onUpdated listener
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
-    console.log("onUpdated tabId: ", tabId, changeInfo, tab, importScripts);
+    console.log("onUpdated tabId: ", tabId, changeInfo, tab);
     if(!tab.url.match("^http") && !tab.url.match(`^chrome-extension://${ chrome.runtime.id }`)){
         return;
     }
     // execute script when tab is completely loaded
     if (changeInfo.status === 'complete') {
-        if(tabId in tabStore){
-            console.log("executeScript: ", tabId, tabStore[tabId]);
-            if(typeof tabStore[tabId] == "function"){
-                await tabStore[tabId](tab);
-            } else if(typeof tabStore[tabId] == "string") {
-                await executeScript(tabId, tabStore[tabId]);
-            }
-            delete tabStore[tabId];
+        if(tabId in tabStore.ids){
+            console.log("executeScript: ", tabId, tabStore.ids[tabId]);
+            executeStoreScript(tabStore.ids, tabId, tab);
         }
+
+        const domain = getDomain(tab.url);
+        if(domain in tabStore.domains){
+            console.log("executeScript: ", domain, tabStore.domains[domain]);
+            executeStoreScript(tabStore.domains, domain, tab);
+        }
+
+        // init Swal for each tab
+        executeScript(tabId, _initSwal);
+        executeScript(tabId, () => {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            Toast.fire({
+                icon: "success",
+                title: "已載入 NStools"
+            })
+        });
     }
 })

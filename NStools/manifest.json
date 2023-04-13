@@ -19,6 +19,6 @@
         "https://*/*"
     ],
     "action": {
-        "default_popup": "tool_index.html"
+        "default_popup": "action_popup_index.html"
     }
 }
