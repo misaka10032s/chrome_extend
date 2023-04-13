@@ -1,18 +1,27 @@
 import { contextMenus } from "./js/setting.js";
-import { executeScript, getDomain, executeStoreScript, injectScript } from "./js/methods.js";
+import { executeScript, getDomain, executeStoreScript } from "./js/methods.js";
 import { tabStore } from "./js/store.js";
 import { _initSwal } from "./js/sweetalert2@11.js";
 
 // ########################################################
 // ######################### menus ########################
 // ########################################################
+// created contextMenus
+const menuIds = new Set();
 for (const [key, value] of Object.entries(contextMenus)) {
-    chrome.contextMenus.create({
+    // check if the id is created
+    if(menuIds.has(key)){
+        continue;
+    }
+
+    var x = chrome.contextMenus.create({
         id: key,
         type: value.type ?? "normal",
         title: value.title,
         contexts: value.contexts,
     });
+    menuIds.add(x);
+    console.log(x)
 }
 
 // ########################################################
@@ -31,6 +40,7 @@ chrome.contextMenus.onClicked.addListener(
 // onUpdated listener
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     console.log("onUpdated tabId: ", tabId, changeInfo, tab);
+    console.log(chrome.storage)
     if(!tab.url.match("^http") && !tab.url.match(`^chrome-extension://${ chrome.runtime.id }`)){
         return;
     }
@@ -49,22 +59,5 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
 
         // init Swal for each tab
         executeScript(tabId, _initSwal);
-        executeScript(tabId, () => {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-            Toast.fire({
-                icon: "success",
-                title: "已載入 NStools"
-            })
-        });
     }
-})
+});
