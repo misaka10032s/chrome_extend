@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval'">
+    <link href="../../css/bootstrap@5.3.0-alpha1.min.css">
+    <script src="../../js/bootstrap@5.3.0-alpha1.min.js"></script>
+    <script src="../../js/vue@3.2.37.js"></script>
+    <script src="../../js/sweetalert2@11.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <ul class="nav nav-tabs">
+            <li v-for="tab in tabBox">
+                <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#tab' + tab.id" role="tab">
+                    {{ tab.name }}
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content p-0 border-top-0">
+            <div v-for="tab in tabBox" class="p-4 tab-pane fade" :id="'tab' + tab.id" role="tabpanel">
+                <div class="card border-0">
+                    <div class="card-header">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="輸入指令" v-model="tab.input">
+                            <button class="btn btn-outline-secondary" type="button" @click="send(tab)">送出</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="alert alert-primary" role="alert">
+                                {{ tab.output }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+    <script src="../../js/NSsupportFnc.js"></script>
+    <script src="../../js/NSHTTPreq.js"></script>
+    <script src="console.js"></script>
+</body>
+</html>

@@ -20,6 +20,6 @@
         "https://*/*"
     ],
     "action": {
-        "default_popup": "action_popup_index.html"
+        "default_popup": "static/template/console/console.html"
     }
 }

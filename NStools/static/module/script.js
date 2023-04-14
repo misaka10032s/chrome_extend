@@ -54,9 +54,10 @@ export const navigation = (input) => {
 
     if(prefix in links) goto(prefix);
     else if(number){
+        const numberValue = parseInt(number);
         if(number.length == 6) goto("n");
         else if(number.length == 5) goto("w");
-        else if(number.length == 8) goto("p");
+        else if(1E7 < numberValue && numberValue < 1.3E8) goto("p");
     }
 }
 

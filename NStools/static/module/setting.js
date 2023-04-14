@@ -1,12 +1,11 @@
 import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg } from "./script.js";
 import { executeScript, getDomain, executeStoreScript } from "./methods.js";
-// ########################################################
-// #                                                      #
-// #                        setting                       #
-// #                                                      #
-// ########################################################
 
-// context menu setting
+// ########################################################
+// #                                                      #
+// #                     context menu                     #
+// #                                                      #
+// ########################################################
 export const contextMenus = {
     reloadImage: {
         title: "重載失敗圖片",
@@ -23,10 +22,28 @@ export const contextMenus = {
         }
     },
     navigation: {
-        title: "goto: %s",
+        title: "NWP: %s",
         contexts: ["selection"],
         script: async (info, tab) => {
             await executeScript(tab.id, navigation, info.selectionText);
+        }
+    },
+    textNhentai: {
+        title: "使用 N-hentai搜尋: %s",
+        contexts: ["selection"],
+        script: async (info, tab) => {
+            await chrome.tabs.create({
+                url: `http://nhentai.net/search/?q=${ info.selectionText }`,
+            });
+        }
+    },
+    textWnacg: {
+        title: "使用 Wnacg搜尋: %s",
+        contexts: ["selection"],
+        script: async (info, tab) => {
+            await chrome.tabs.create({
+                url: `http://wnacg.org/q/?q=${ info.selectionText }`,
+            });
         }
     },
     imageSaucenao: {
@@ -57,3 +74,23 @@ export const contextMenus = {
         }
     },
 };
+
+// ########################################################
+// #                                                      #
+// #                     redirector                       #
+// #                                                      #
+// ########################################################
+
+export const redirectOptions = [
+    // old pixiv to new pixiv
+    {
+        reg: "https://www.pixiv.net/member_illust.php\\?mode=medium&illust_id=(\\d+)",
+        url: "https://www.pixiv.net/artworks/$1",
+    },
+    // remove "fbclid" query from url
+    {
+        query: {
+            remove: ["fbclid"],
+        }
+    }
+]
