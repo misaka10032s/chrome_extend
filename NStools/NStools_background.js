@@ -72,7 +72,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
         let origUrl = details.url;
         // console.log("old href", origUrl)
         const {newUrl, isChanged} = redirectUrl(redirectOptions, origUrl);
-        // console.log("new href", newUrl);
+        // console.log("new href", newUrl, isChanged);
         if(isChanged) chrome.tabs.update(details.tabId, {url: newUrl});
     },
     {urls: ["<all_urls>"]}
@@ -83,6 +83,7 @@ const redirectUrl = (options, origUrl) => {
         origUrl = window.location.href;
     }
     var newUrl = origUrl;
+    var isChanged = false;
 
     for(let i in options){
         const rule = options[i];
@@ -91,35 +92,47 @@ const redirectUrl = (options, origUrl) => {
             const tmpReg = new RegExp(rule.reg);
             if(!newUrl.match(tmpReg)) continue;
             newUrl = newUrl.replace(tmpReg, rule.url);
+            isChanged = true;
         }
         // use query, if rule.query is exist
         else if(rule.query){
             const u = new URL(newUrl);
             // if rule.query.remove is String, delete it
             if(typeof rule.query.remove == "string") {
+                // if not exist, continue
+                if(!u.searchParams.has(rule.query)) continue;
                 u.searchParams.delete(rule.query);
+                isChanged = true;
             }
             // if rule.query.remove is Array, delete all of them
             else if(Array.isArray(rule.query.remove)){
                 for(let j in rule.query.remove){
+                    // if not exist, continue
+                    if(!u.searchParams.has(rule.query.remove[j])) continue;
                     u.searchParams.delete(rule.query.remove[j]);
+                    isChanged = true;
                 }
             }
 
             // if rule.query.add is String, add it
             if(typeof rule.query.add == "string") {
+                // if exist, continue
+                if(u.searchParams.has(rule.query)) continue;
                 u.searchParams.append(rule.query);
+                isChanged = true;
             }
             // if rule.query.add is Array, add all of them
             else if(Array.isArray(rule.query.add)){
                 for(let j in rule.query.add){
+                    // if exist, continue
+                    if(u.searchParams.has(rule.query.add[j])) continue;
                     u.searchParams.append(rule.query.add[j]);
+                    isChanged = true;
                 }
             }
             newUrl = u.href;
         }
     }
-    const isChanged = newUrl != origUrl;
     if(typeof window != "undefined" && isChanged) window.history.replaceState({}, document.title, newUrl);
     return {newUrl, isChanged};
 }
