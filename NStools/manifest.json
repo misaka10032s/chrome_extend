@@ -13,7 +13,8 @@
         "contextMenus",
         "tabs",
         "scripting",
-        "storage"
+        "storage",
+        "webNavigation"
     ],
     "host_permissions": [
         "http://*/*",

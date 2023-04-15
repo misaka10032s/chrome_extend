@@ -73,6 +73,13 @@ export const contextMenus = {
             await executeScript(tab.id, getBahaImg, tab);
         }
     },
+    downloadBlob: {
+        title: "下載影片",
+        contexts: ["video"],
+        script: async (info, tab) => {
+            const url = info.srcUrl;
+        }
+    },
 };
 
 // ########################################################
