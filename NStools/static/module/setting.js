@@ -1,4 +1,4 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg } from "./script.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, deQrcode } from "./script.js";
 import { executeScript, getDomain, executeStoreScript } from "./methods.js";
 
 // ########################################################
@@ -71,13 +71,18 @@ export const contextMenus = {
         contexts: ["page"],
         script: async (info, tab) => {
             await executeScript(tab.id, getBahaImg, tab);
-        }
+        },
+        documentUrlPatterns: ["https://forum.gamer.com.tw/*"]
     },
-    downloadBlob: {
-        title: "下載影片",
-        contexts: ["video"],
+    deQrcode: {
+        title: "解析QRcode",
+        contexts: ["image"],
         script: async (info, tab) => {
-            const url = info.srcUrl;
+            console.log(info);
+            await executeScript(tab.id, deQrcode, tab);
+            // await executeScript(tab.id, (info) => {
+            //     console.log([src=`'${ info.srcUrl }'`], document.querySelector(`[src='${ info.srcUrl }']`))
+            // }, info);
         }
     },
 };
@@ -91,7 +96,7 @@ export const contextMenus = {
 export const redirectOptions = [
     // old pixiv to new pixiv
     {
-        reg: "https://www.pixiv.net/member_illust.php\\?mode=medium&illust_id=(\\d+)",
+        reg: "https://www.pixiv.net/member_illust.php\\\\?mode=medium&illust_id=(\\d+)",
         url: "https://www.pixiv.net/artworks/$1",
     },
     // remove "fbclid" query from url

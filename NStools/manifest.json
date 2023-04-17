@@ -21,6 +21,12 @@
         "https://*/*"
     ],
     "action": {
-        "default_popup": "static/template/console/console.html"
+        "default_popup": "static/template/popup/action_popup_index.html"
+    },
+    "externally_connectable": {
+        "matches": [
+            "http://*/*",
+            "https://*/*"
+        ]
     }
 }

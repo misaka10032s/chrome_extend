@@ -21,5 +21,6 @@ export const _initSwal = () => {
     Toast.fire({
         icon: "success",
         title: "已載入 NStools"
-    })
+    });
+    window.Toast = Toast;
 }

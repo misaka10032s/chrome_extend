@@ -5,4 +5,5 @@ export const degug = true;
 export const tabStore = {
     ids: {},
     domains: {},
+    always: []
 };

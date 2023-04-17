@@ -1,5 +1,5 @@
 import { contextMenus, redirectOptions } from "./static/module/setting.js";
-import { executeScript, getDomain, executeStoreScript } from "./static/module/methods.js";
+import { executeScript, getDomain, executeStoreScript, redirectUrl, handleMessage } from "./static/module/methods.js";
 import { tabStore } from "./static/module/store.js";
 import { _initSwal } from "./static/module/sweetalert2@11.js";
 
@@ -16,9 +16,11 @@ for (const [key, value] of Object.entries(contextMenus)) {
 
     var x = chrome.contextMenus.create({
         id: key,
+        parentId: value.parentId,
         type: value.type ?? "normal",
         title: value.title,
         contexts: value.contexts,
+        documentUrlPatterns: value.documentUrlPatterns,
     });
     menuIds.add(x);
 }
@@ -60,8 +62,14 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
             executeStoreScript(tabStore.domains, domain, tab);
         }
 
+        for(let i in tabStore.always){
+            console.log("executeScript: ", tabStore.always[i]);
+            executeStoreScript(tabStore.always, i, tab);
+        }
+
         // init Swal for each tab
         executeScript(tabId, _initSwal);
+        executeScript(tabId, handleMessage);
     }
 });
 
@@ -77,63 +85,3 @@ chrome.webNavigation.onBeforeNavigate.addListener(
     },
     {urls: ["<all_urls>"]}
 );
-
-const redirectUrl = (options, origUrl) => {
-    if(!origUrl && typeof window != "undefined"){
-        origUrl = window.location.href;
-    }
-    var newUrl = origUrl;
-    var isChanged = false;
-
-    for(let i in options){
-        const rule = options[i];
-        // use regexp, if rule.reg and rule.url are both exist
-        if(rule.reg && rule.url){
-            const tmpReg = new RegExp(rule.reg);
-            if(!newUrl.match(tmpReg)) continue;
-            newUrl = newUrl.replace(tmpReg, rule.url);
-            isChanged = true;
-        }
-        // use query, if rule.query is exist
-        else if(rule.query){
-            const u = new URL(newUrl);
-            // if rule.query.remove is String, delete it
-            if(typeof rule.query.remove == "string") {
-                // if not exist, continue
-                if(!u.searchParams.has(rule.query)) continue;
-                u.searchParams.delete(rule.query);
-                isChanged = true;
-            }
-            // if rule.query.remove is Array, delete all of them
-            else if(Array.isArray(rule.query.remove)){
-                for(let j in rule.query.remove){
-                    // if not exist, continue
-                    if(!u.searchParams.has(rule.query.remove[j])) continue;
-                    u.searchParams.delete(rule.query.remove[j]);
-                    isChanged = true;
-                }
-            }
-
-            // if rule.query.add is String, add it
-            if(typeof rule.query.add == "string") {
-                // if exist, continue
-                if(u.searchParams.has(rule.query)) continue;
-                u.searchParams.append(rule.query);
-                isChanged = true;
-            }
-            // if rule.query.add is Array, add all of them
-            else if(Array.isArray(rule.query.add)){
-                for(let j in rule.query.add){
-                    // if exist, continue
-                    if(u.searchParams.has(rule.query.add[j])) continue;
-                    u.searchParams.append(rule.query.add[j]);
-                    isChanged = true;
-                }
-            }
-            newUrl = u.href;
-        }
-    }
-    if(typeof window != "undefined" && isChanged) window.history.replaceState({}, document.title, newUrl);
-    return {newUrl, isChanged};
-}
-    
