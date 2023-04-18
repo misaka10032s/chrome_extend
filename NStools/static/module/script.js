@@ -121,42 +121,16 @@ export const deQrcode = async () => {
             qrcode.decodeFromImage(image).then(result => {
                 // console.log(result);
                 result.data && navigator.clipboard?.writeText && navigator.clipboard.writeText(result.data);
-                Toast.fire("success", result.data ?? "No data found");
+                Toast(3000).fire("解析成功", result.data ?? "解析失敗");
             });
         }
         catch{
-            Toast.fire("error", "Decode failed");
+            Toast(1500).fire("error", "解析失敗");
         }
     }, 50);
-
-    // const imageBlob = await fetch(image.src).then(response => response.blob());
-    // const reader = new FileReader();
-    // reader.readAsDataURL(imageBlob);
-    // reader.onloadend = () => {
-    //     const base64EncodedImage = reader.result.split(',')[1];
-    //     const img = document.createElement('img');
-    //     img.src = 'data:image/jpeg;base64,' + base64EncodedImage;
-    //     img.crossOrigin = "Anonymous"
-    //     // document.body.appendChild(img);
-
-    //     const qrcode = new QrcodeDecoder();
-    //     // console.log(img, qrcode);
-    //     try{
-    //         qrcode.decodeFromImage(image).then(result => {
-    //             console.log(result);
-    //             result.data && navigator.clipboard?.writeText && navigator.clipboard.writeText(result.data);
-    //             Toast.fire("success data:", result.data ?? "No data found");
-    //         });
-    //     }
-    //     catch{
-    //         Toast.fire("error", "Decode failed");
-    //     }
-    // }
 }
 
 tabStore.always.push({
-    script: "QrcodeDecoder.js"
-}, {
     script: (tab) => {
         document.addEventListener("contextmenu", e => {
             const ele = document.elementFromPoint(e.x, e.y);

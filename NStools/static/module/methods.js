@@ -64,9 +64,22 @@ export const redirectUrl = (options, origUrl) => {
     }
     var newUrl = origUrl;
     var isChanged = false;
+    const host = new URL(origUrl).host;
 
     for (let i in options) {
         const rule = options[i];
+        // if rule.host exists and is not match, continue
+        if (rule.host){
+            // if rule.host is String, check if it is match
+            if (typeof rule.host == "string") {
+                if (rule.host != host) continue;
+            }
+            // if rule.host is Array, check if it is match
+            else if (Array.isArray(rule.host)) {
+                if (!rule.host.includes(host)) continue;
+            }
+        }
+
         // use regexp, if rule.reg and rule.url are both exist
         if (rule.reg && rule.url) {
             const tmpReg = new RegExp(rule.reg);
@@ -74,6 +87,7 @@ export const redirectUrl = (options, origUrl) => {
             newUrl = newUrl.replace(tmpReg, rule.url);
             isChanged = true;
         }
+
         // use query, if rule.query is exist
         else if (rule.query) {
             const u = new URL(newUrl);

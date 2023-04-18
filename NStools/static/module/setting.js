@@ -1,5 +1,6 @@
 import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, deQrcode } from "./script.js";
 import { executeScript, getDomain, executeStoreScript } from "./methods.js";
+import { tabVars } from "./store.js";
 
 // ########################################################
 // #                                                      #
@@ -7,6 +8,18 @@ import { executeScript, getDomain, executeStoreScript } from "./methods.js";
 // #                                                      #
 // ########################################################
 export const contextMenus = {
+    openPopup: {
+        title: "開啟插件",
+        contexts: ["page"],
+        script: async (info, tab) => {
+            chrome.windows.create({
+                type: "popup",
+                url: chrome.runtime.getURL("static/template/console/console.html"),
+                width: 600,
+                height: 400
+            });
+        }
+    },
     reloadImage: {
         title: "重載失敗圖片",
         contexts: ["page"],
@@ -78,11 +91,11 @@ export const contextMenus = {
         title: "解析QRcode",
         contexts: ["image"],
         script: async (info, tab) => {
-            console.log(info);
+            if (!tabVars[tab.id].loadedQR) {
+                await executeScript(tab.id, "QrcodeDecoder.js");
+                tabVars[tab.id].loadedQR = true;
+            }
             await executeScript(tab.id, deQrcode, tab);
-            // await executeScript(tab.id, (info) => {
-            //     console.log([src=`'${ info.srcUrl }'`], document.querySelector(`[src='${ info.srcUrl }']`))
-            // }, info);
         }
     },
 };
@@ -103,6 +116,12 @@ export const redirectOptions = [
     {
         query: {
             remove: ["fbclid"],
+        }
+    },
+    {
+        host: "twitter.com",
+        query: {
+            remove: ["t"],
         }
     }
 ]

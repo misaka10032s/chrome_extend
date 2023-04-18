@@ -1,6 +1,6 @@
 import { contextMenus, redirectOptions } from "./static/module/setting.js";
 import { executeScript, getDomain, executeStoreScript, redirectUrl, handleMessage } from "./static/module/methods.js";
-import { tabStore } from "./static/module/store.js";
+import { tabStore, tabVars } from "./static/module/store.js";
 import { _initSwal } from "./static/module/sweetalert2@11.js";
 
 // ########################################################
@@ -68,6 +68,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
         }
 
         // init Swal for each tab
+        tabVars[tabId] = {};
         executeScript(tabId, _initSwal);
         executeScript(tabId, handleMessage);
     }
@@ -85,3 +86,15 @@ chrome.webNavigation.onBeforeNavigate.addListener(
     },
     {urls: ["<all_urls>"]}
 );
+
+chrome.commands.onCommand.addListener((command) => {
+    console.log(`Command "${command}" triggered`, command == "Ctrl+B");
+    switch (command) {
+        case "Ctrl+B":
+            break;
+        case "A+B+C":
+            break;
+        default:
+            break;
+    }
+});

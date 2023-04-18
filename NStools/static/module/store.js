@@ -7,3 +7,6 @@ export const tabStore = {
     domains: {},
     always: []
 };
+
+// id: {vars...: values...}
+export const tabVars = {};
