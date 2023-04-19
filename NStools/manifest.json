@@ -30,13 +30,6 @@
         ]
     },
     "commands": {
-        "Ctrl+B": {
-            "suggested_key": {
-                "default": "Ctrl+B",
-                "mac": "MacCtrl+B"
-            },
-            "description": "打開NS工具包"
-        },
         "Ctrl+Shift+Z": {
             "suggested_key": {
                 "default": "Ctrl+Shift+Z",
