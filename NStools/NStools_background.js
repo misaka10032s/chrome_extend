@@ -7,23 +7,25 @@ import { _initSwal } from "./static/module/sweetalert2@11.js";
 // ######################### menus ########################
 // ########################################################
 // created contextMenus
-const menuIds = new Set();
-for (const [key, value] of Object.entries(contextMenus)) {
-    // check if the id is created
-    if (menuIds.has(key)) {
-        continue;
+chrome.contextMenus.removeAll(function() {
+    const menuIds = new Set();
+    for (const [key, value] of Object.entries(contextMenus)) {
+        // check if the id is created
+        if (menuIds.has(key)) {
+            continue;
+        }
+    
+        var x = chrome.contextMenus.create({
+            id: key,
+            parentId: value.parentId,
+            type: value.type ?? "normal",
+            title: value.title,
+            contexts: value.contexts,
+            documentUrlPatterns: value.documentUrlPatterns,
+        });
+        menuIds.add(x);
     }
-
-    var x = chrome.contextMenus.create({
-        id: key,
-        parentId: value.parentId,
-        type: value.type ?? "normal",
-        title: value.title,
-        contexts: value.contexts,
-        documentUrlPatterns: value.documentUrlPatterns,
-    });
-    menuIds.add(x);
-}
+});
 
 // ########################################################
 // ####################### listener #######################
