@@ -110,24 +110,68 @@ tabStore.domains["forum.gamer.com.tw"] = {
     }
 }
 
+// export chatGPT as image
+export const exportChatGPTConversation = () => {
+    const allChat = document.querySelector("main").children[0].children[0].children[0].children[0];
+    const title = document.querySelector("title").innerText;
+    html2canvas(allChat).then(function(canvas) {
+        // trans canvas to image
+        canvas.toBlob(function(blob) {
+            const blobUrl = URL.createObjectURL(blob);
+            const img = new Image();
+            img.src = blobUrl;
+
+            const a = document.createElement("a");
+            a.href = blobUrl;
+            a.download = title;
+            a.appendChild(img);
+
+            // open img as new tab
+            const w = window.open("");
+            // write img to new tab
+            w.document.write(a.outerHTML);
+            // set title
+            w.document.title = title;
+        }, "image/png");
+    });
+}
+
 // qrcode decoder
 export const deQrcode = async () => {
     const image = document.clickedImage;
-    image.crossOrigin = "Anonymous";
-    setTimeout(()=>{
-        const qrcode = new QrcodeDecoder();
-        // console.log(image, qrcode);
-        try{
-            qrcode.decodeFromImage(image).then(result => {
-                // console.log(result);
+
+    fetch(image.src).then(async r => {
+        const image2 = new Image();
+        image2.src = URL.createObjectURL(await r.blob());
+        // image2.crossOrigin = "Anonymous";
+        image2.onload = () => {
+            const qrcode = new QrcodeDecoder();
+            qrcode.decodeFromImage(image2).then(result => {
                 result.data && navigator.clipboard?.writeText && navigator.clipboard.writeText(result.data);
-                Toast(3000).fire("解析成功", result.data ?? "解析失敗");
+                const status = result.data ? "解析成功" : "解析失敗";
+                Toast(3000).fire(status, result.data ?? "");
             });
         }
-        catch{
-            Toast(1500).fire("error", "解析失敗");
-        }
-    }, 50);
+    }).catch(e => {
+        Toast(1500).fire("error", "解析失敗 :(", e);
+    });
+
+    // image.crossOrigin = "Anonymous";
+    // setTimeout(()=>{
+    //     const qrcode = new QrcodeDecoder();
+    //     // console.log(image, qrcode);
+    //     try{
+    //         qrcode.decodeFromImage(image).then(result => {
+    //             // console.log(result);
+    //             result.data && navigator.clipboard?.writeText && navigator.clipboard.writeText(result.data);
+    //             const status = result.data ? "解析成功" : "解析失敗";
+    //             Toast(3000).fire(status, result.data ?? "");
+    //         });
+    //     }
+    //     catch(e){
+    //         Toast(1500).fire("error", "解析失敗 :(", e);
+    //     }
+    // }, 50);
 }
 
 tabStore.always.push({

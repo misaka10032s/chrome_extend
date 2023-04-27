@@ -1,3 +1,5 @@
+import { tabVars } from "./store.js";
+
 export const executeScript = async (target, file, ...args) => {
     var tabId;
     console.log("file", typeof file, file)
@@ -50,6 +52,7 @@ export const getDomain = (url) => {
     return domain ? domain[1] : "";
 }
 
+// execute script in obj[key].script and delete obj[key] if obj[key].delete is true
 export const executeStoreScript = async (obj, key, tab) => {
     if (typeof obj[key].script == "function" || typeof obj[key].script == "string") {
         await executeScript(tab.id, obj[key].script, tab, ...(obj[key].args ?? []));
@@ -141,3 +144,13 @@ export const handleMessage = () => {
             sendResponse({ farewell: "再見" });
     });
 };
+
+// inject script to tab that can be used in window.$script or $script
+export const injectScript = async (tabID, file) => {
+    if(!tabVars[tabID]) tabVars[tabID] = {};
+    if(!tabVars[tabID][file]){
+        console.log("injectScript", tabID, file)
+        await executeScript(tabID, file);
+        tabVars[tabID][file] = true;
+    }
+}

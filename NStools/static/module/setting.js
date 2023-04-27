@@ -1,5 +1,5 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, deQrcode } from "./script.js";
-import { executeScript, getDomain, executeStoreScript } from "./methods.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode } from "./script.js";
+import { executeScript, getDomain, executeStoreScript, injectScript } from "./methods.js";
 import { tabVars } from "./store.js";
 
 // ########################################################
@@ -47,6 +47,7 @@ export const contextMenus = {
         script: async (info, tab) => {
             await chrome.tabs.create({
                 url: `http://nhentai.net/search/?q=${ info.selectionText }`,
+                index: tab.index + 1
             });
         }
     },
@@ -56,6 +57,7 @@ export const contextMenus = {
         script: async (info, tab) => {
             await chrome.tabs.create({
                 url: `http://wnacg.org/search/?q=${ info.selectionText }`,
+                index: tab.index + 1
             });
         }
     },
@@ -65,6 +67,7 @@ export const contextMenus = {
         script: async (info, tab) => {
             const newTab = await chrome.tabs.create({
                 url: "https://saucenao.com/",
+                index: tab.index + 1
             });
             await executeScript(newTab.id, searchSaucenao, info.srcUrl);
         }
@@ -75,6 +78,7 @@ export const contextMenus = {
         script: async (info, tab) => {
             const newTab = await chrome.tabs.create({
                 url: "https://ascii2d.net/",
+                index: tab.index + 1
             });
             await executeScript(newTab.id, searchAscii2d, info.srcUrl);
         }
@@ -87,14 +91,20 @@ export const contextMenus = {
         },
         documentUrlPatterns: ["https://forum.gamer.com.tw/*"]
     },
+    exportChatGPTConversation: {
+        title: "匯出chatGPT圖片",
+        contexts: ["page"],
+        script: async (info, tab) => {
+            await injectScript(tab.id, "html2canvas.js");
+            await executeScript(tab.id, exportChatGPTConversation, tab);
+        },
+        documentUrlPatterns: ["https://chat.openai.com/*"]
+    },
     deQrcode: {
         title: "解析QRcode",
         contexts: ["image"],
         script: async (info, tab) => {
-            if (!tabVars[tab.id].loadedQR) {
-                await executeScript(tab.id, "QrcodeDecoder.js");
-                tabVars[tab.id].loadedQR = true;
-            }
+            await injectScript(tab.id, "QrcodeDecoder.js");
             await executeScript(tab.id, deQrcode, tab);
         }
     },
@@ -108,10 +118,10 @@ export const contextMenus = {
 
 export const redirectOptions = [
     // old pixiv to new pixiv
-    {
-        reg: "https://www.pixiv.net/member_illust.php\\\\?mode=medium&illust_id=(\\d+)",
-        url: "https://www.pixiv.net/artworks/$1",
-    },
+    // {
+    //     reg: "https://www.pixiv.net/member_illust.php\\\\?mode=medium&illust_id=(\\d+)",
+    //     url: "https://www.pixiv.net/artworks/$1",
+    // },
     // remove "fbclid" query from url
     {
         query: {
