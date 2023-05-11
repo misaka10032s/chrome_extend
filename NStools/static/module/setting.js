@@ -56,7 +56,7 @@ export const contextMenus = {
         contexts: ["selection"],
         script: async (info, tab) => {
             await chrome.tabs.create({
-                url: `http://wnacg.org/search/?q=${ info.selectionText }`,
+                url: `http://wnacg.com/search/?q=${ info.selectionText }`,
                 index: tab.index + 1
             });
         }
