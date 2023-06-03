@@ -42,7 +42,7 @@ export const navigation = (input) => {
 
     const links = {
         "n": ["http://nhentai.net/g/", ""],
-        "w": ["https://www.wnacg.org/photos-index-aid-", ".html"],
+        "w": ["https://www.wnacg.com/photos-index-aid-", ".html"],
         "p": ["https://www.pixiv.net/artworks/", ""],
     }
 

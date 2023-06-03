@@ -135,7 +135,7 @@ export const redirectUrl = (options, origUrl) => {
 }
 
 export const handleMessage = () => {
-    console.log("added listener");
+    // console.log("added listener");
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         console.log(sender.tab ?
             "取得到tab，這是來自內容腳本的訊息：" + sender.tab.url
