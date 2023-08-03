@@ -131,7 +131,7 @@ export const redirectOptions = [
     {
         host: "twitter.com",
         query: {
-            remove: ["t"],
+            remove: ["t", "s"],
         }
     }
 ]
