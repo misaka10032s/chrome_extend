@@ -32,6 +32,15 @@ export const anitWhite = () => {
     R("selectstart");
     R("keydoun");
     R("keyup");
+
+    // select all html element and set "user-select" to "auto"
+    document.querySelectorAll("*").forEach(e => {
+        // get style of element (including css)
+        const style = window.getComputedStyle(e);
+        if(style.getPropertyValue("user-select") == "none"){
+            e.style.userSelect = "auto";
+        }
+    });
 }
 
 // @navigation
