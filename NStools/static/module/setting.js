@@ -61,6 +61,18 @@ export const contextMenus = {
             });
         }
     },
+    textRemoveWhite: {
+        title: "前往: %s",
+        contexts: ["selection"],
+        script: async (info, tab) => {
+            const rmw = info.selectionText.replace(/[\s]*/g, "");
+            const target = rmw.match(/^https?:\/\//) ? rmw : `https://${ rmw }`;
+            await chrome.tabs.create({
+                url: target,
+                index: tab.index + 1
+            });
+        }
+    },
     imageSaucenao: {
         title: "使用 saucenao搜尋圖片", // https://saucenao.com
         contexts: ["image"],
