@@ -34,6 +34,23 @@ export const contextMenus = {
             await executeScript(tab.id, anitWhite);
         }
     },
+    dlsiteASMR: {
+        title: "free dlsite ASMR",
+        contexts: ["page"],
+        script: async (info, tab) => {
+            // get url (https://www.dlsite.com/maniax/work/=/product_id/RJxxxxx.html)
+            const url = tab.url;
+            // get product_id
+            const product_id = url.match(/product_id\/RJ(\d+)/);
+            // if product_id is not found, return
+            if (!product_id) return;
+            // go to https://www.asmr.one/work/RJxxxxx
+            await chrome.tabs.create({
+                url: `https://www.asmr.one/work/RJ${ product_id[1] }`,
+                index: tab.index + 1
+            });
+        }
+    },
     navigation: {
         title: "NWP: %s",
         contexts: ["selection"],
