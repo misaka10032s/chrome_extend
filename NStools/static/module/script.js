@@ -50,7 +50,7 @@ export const navigation = (input) => {
     const [_, prefix, number] = input.toLowerCase().match(/([a-z]?)([0-9]+)/) ?? [];
 
     const links = {
-        "n": ["http://nhentai.net/g/", ""],
+        "n": ["http://nhentai.website/g/", ""],
         "w": ["https://www.wnacg.com/photos-index-aid-", ".html"],
         "p": ["https://www.pixiv.net/artworks/", ""],
     }

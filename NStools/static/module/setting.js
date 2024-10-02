@@ -63,7 +63,7 @@ export const contextMenus = {
         contexts: ["selection"],
         script: async (info, tab) => {
             await chrome.tabs.create({
-                url: `http://nhentai.net/search/?q=${ info.selectionText }`,
+                url: `http://nhentai.website/search/?q=${ info.selectionText }`,
                 index: tab.index + 1
             });
         }
@@ -127,7 +127,7 @@ export const contextMenus = {
             await injectScript(tab.id, "html2canvas.js");
             await executeScript(tab.id, exportChatGPTConversation, tab);
         },
-        documentUrlPatterns: ["https://chat.openai.com/*"]
+        documentUrlPatterns: ["https://chat.openai.com/*", "https://chatgpt.com/*"]
     },
     deQrcode: {
         title: "解析QRcode",
@@ -158,7 +158,7 @@ export const redirectOptions = [
         }
     },
     {
-        host: "twitter.com",
+        host: ["twitter.com", "mobile.twitter.com", "x.com"],
         query: {
             remove: ["t", "s"],
         }
