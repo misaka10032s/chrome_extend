@@ -154,3 +154,14 @@ export const injectScript = async (tabID, file) => {
         tabVars[tabID][file] = true;
     }
 }
+
+// download images
+export const downloadImages = async (images) => {
+    console.log('chrome.downloads', chrome.downloads, images)
+    images.forEach(image => {
+        chrome.downloads.download({
+            url: image,
+            filename: image.split("/").pop()
+        });
+    });
+}

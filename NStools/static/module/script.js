@@ -1,4 +1,5 @@
 import { tabStore } from "./store.js";
+import { downloadImages } from "./methods.js";
 /*
     reloadImage: reload all images which loaded failure on the page
     anitWhite: remove the site to prevent user select
@@ -181,6 +182,17 @@ export const deQrcode = async () => {
     //         Toast(1500).fire("error", "解析失敗 :(", e);
     //     }
     // }, 50);
+}
+
+export const getPixivAllImg = async (info) => {
+    // page url: https://www.pixiv.net/artworks/123793853
+    // image url: https://i.pximg.net/img-original/img/2024/10/29/21/21/19/123793853_p0.jpg
+
+    // get image url
+    const imageNumber = info.frameUrl.split("/").pop();
+    // get image number
+    const images = [...document.querySelectorAll("a")].map(e => e.href).filter(e => e.includes(imageNumber)).filter(e => e.includes("i.pximg.net"));
+    return images;
 }
 
 tabStore.always.push({

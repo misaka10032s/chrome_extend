@@ -1,5 +1,5 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode } from "./script.js";
-import { executeScript, getDomain, executeStoreScript, injectScript } from "./methods.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
+import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./methods.js";
 import { tabVars } from "./store.js";
 
 // ########################################################
@@ -136,6 +136,15 @@ export const contextMenus = {
             await injectScript(tab.id, "QrcodeDecoder.js");
             await executeScript(tab.id, deQrcode, tab);
         }
+    },
+    getPixivAllImg: {
+        title: "pixiv: 下載所有圖片",
+        contexts: ["image"],
+        script: async (info, tab) => {
+            const images = await executeScript(tab.id, getPixivAllImg, info);
+            await downloadImages(images[0].result);
+        },
+        documentUrlPatterns: ["https://www.pixiv.net/artworks/*"]
     },
 };
 

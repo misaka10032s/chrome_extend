@@ -14,7 +14,8 @@
         "tabs",
         "scripting",
         "storage",
-        "webNavigation"
+        "webNavigation",
+        "downloads"
     ],
     "host_permissions": [
         "http://*/*",
