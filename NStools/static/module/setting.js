@@ -35,7 +35,7 @@ export const contextMenus = {
         }
     },
     dlsiteASMR: {
-        title: "free dlsite ASMR",
+        title: "試聽 dlsite ASMR",
         contexts: ["page"],
         script: async (info, tab) => {
             // get url (https://www.dlsite.com/maniax/work/=/product_id/RJxxxxx.html)
@@ -49,7 +49,8 @@ export const contextMenus = {
                 url: `https://www.asmr.one/work/RJ${ product_id[1] }`,
                 index: tab.index + 1
             });
-        }
+        },
+        documentUrlPatterns: ["https://www.dlsite.com/maniax/work/*"]
     },
     navigation: {
         title: "NWP: %s",
@@ -63,7 +64,8 @@ export const contextMenus = {
         contexts: ["selection"],
         script: async (info, tab) => {
             await chrome.tabs.create({
-                url: `http://nhentai.website/search/?q=${ info.selectionText }`,
+                url: `http://nhentai.net/search/?q=${ info.selectionText }`,
+                // url: `http://nhentai.website/search/?q=${ info.selectionText }`,
                 index: tab.index + 1
             });
         }
