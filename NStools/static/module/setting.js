@@ -1,6 +1,7 @@
 import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
 import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./methods.js";
-import { tabVars } from "./store.js";
+import { tabVars, storeData } from "./store.js";
+import key from "./../secret/key.js";
 
 // ########################################################
 // #                                                      #
@@ -175,3 +176,64 @@ export const redirectOptions = [
         }
     }
 ]
+
+// ########################################################
+// #                                                      #
+// #                      omnibox                         #
+// #                                                      #
+// ########################################################
+
+export const omniboxCallback = {
+    currencyTrans: {
+        onInputChanged: async (text, suggest) => {
+            const exangeKey = key["exchangerate-api.com"];
+            if (!exangeKey) {
+                suggest([
+                    { content: "請先設定 exchangerate-api.com API key", description: "請先設定 exchangerate-api.com API key" }
+                ]);
+                return;
+            }
+
+            storeData.currency = storeData.currency || {};
+            // if inputed text format "<number> <currency> to <currency>"
+            let [_, amount, from, to] = text.match(/(\d+\.?\d*)\s*([a-zA-Z]{3})\s*to\s*([a-zA-Z]{3})/i) || [];
+            if (amount && from && to) {
+                const transDict = {
+                    RMB: "CNY",
+                    NTD: "TWD",
+                }
+
+                from = transDict[from.toUpperCase()] || from.toUpperCase();
+                to = transDict[to.toUpperCase()] || to.toUpperCase();
+
+                // to is main currency
+                // find if from or to not in storeData.currency {c: {C0: rate0, C1: rate1, ...}}
+                const isRate = storeData.currency[to]?.[from];
+                // console.log("rate: ", rate, storeData.currency, from, to);
+
+                // if rate is found
+                // call api https://v6.exchangerate-api.com/v6/<key>/latest/<currency>
+                if(!isRate){
+                    const rateData = await fetch(`https://v6.exchangerate-api.com/v6/${ key["exchangerate-api.com"] }/latest/${ to }`)
+                        .then(res => res.json());
+
+                    // console.log("rateData: ", rateData);
+                    const conversion_rates = rateData.conversion_rates;
+                    storeData.currency[to] = conversion_rates;
+                    for (const [c, r] of Object.entries(conversion_rates)) {
+                        storeData.currency[c] = storeData.currency[c] || {};
+                        storeData.currency[c][to] = 1 / r;
+                    }
+                }
+
+                // calculate amount
+                const result = amount / (storeData.currency[to][from] || 1);
+
+                // suggest result
+                suggest([
+                    { content: result.toFixed(2), description: `${ amount } ${ from } = ${ result.toFixed(2) } ${ to }` }
+                ]);
+            }
+        }
+    }
+}

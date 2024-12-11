@@ -38,5 +38,11 @@
             },
             "description": "test"
         }
+    },
+    "omnibox": {
+        "keyword": "ns"
+    },
+    "icons": {
+        "16": "static/images/icon16.png"
     }
 }

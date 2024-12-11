@@ -1,4 +1,4 @@
-import { contextMenus, redirectOptions } from "./static/module/setting.js";
+import { contextMenus, redirectOptions, omniboxCallback } from "./static/module/setting.js";
 import { executeScript, getDomain, executeStoreScript, redirectUrl, handleMessage } from "./static/module/methods.js";
 import { tabStore, tabVars } from "./static/module/store.js";
 import { _initSwal } from "./static/js/sweetalert2@11.js";
@@ -33,8 +33,7 @@ chrome.contextMenus.removeAll(function() {
 // onClicked listener
 chrome.contextMenus.onClicked.addListener(
     async (info, tab) => {
-        console.log("info: ", info);
-        console.log("tab: ", tab);
+        console.log('info: ', info, 'tab: ', tab);
         if (info.menuItemId in contextMenus) {
             await contextMenus[info.menuItemId].script(info, tab);
         }
@@ -90,7 +89,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
 );
 
 chrome.commands.onCommand.addListener((command) => {
-    console.log(`Command "${command}" triggered`, command == "Ctrl+B");
+    console.log(`Command "${command}" triggered`, command == "Ctrl+B", command == "Ctrl+Shift+Z");
     switch (command) {
         case "Ctrl+B":
             break;
@@ -100,3 +99,17 @@ chrome.commands.onCommand.addListener((command) => {
             break;
     }
 });
+
+chrome.omnibox.setDefaultSuggestion({ description: "歡迎使用 NStools" });
+for(const [key, value] of Object.entries(omniboxCallback)){
+    if(value.onInputChanged){
+        chrome.omnibox.onInputChanged.addListener(value.onInputChanged);
+    }
+}
+// example
+// chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+//     suggest([
+//         { content: "color:#228B22", description: "Green", deletable: true },
+//     ]);
+//     chrome.omnibox.setDefaultSuggestion({ description: "Error fetching conversion rate." });
+// });

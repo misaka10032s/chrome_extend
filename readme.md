@@ -53,9 +53,14 @@
     - 下載pixiv所有圖片
     - 僅在pixiv網域出現
 
+
 # redirectOptions功能
 1. 把所有網址的fbclid從query string移除
 2. 把推特網址的t, s從query string移除
+
+
+# omnibox功能
+1. 在網址列輸入 "ns" 後輸入 <number> <currencyA> to <currencyB> 來查詢匯率 (ex: ns 100 twd to jpy) 支援 NTD(=TWD) 和 RMB(=CNY)
 
 
 
