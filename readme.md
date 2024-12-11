@@ -63,6 +63,18 @@
 1. 在網址列輸入 "ns" 後輸入 <number> <currencyA> to <currencyB> 來查詢匯率 (ex: ns 100 twd to jpy) 支援 NTD(=TWD) 和 RMB(=CNY)
 
 
+# key設定
+1. 在 NStools 建立資料夾 secret
+2. 在 secret 建立檔案 key.js
+3. 在 key.js 輸入以下程式碼
+```javascript
+export default {
+    "exchangerate-api.com": "your key", // 匯率查詢
+    ...
+}
+```
+
+
 
 # for developers
 ## NStools/static/moudle/settings.js

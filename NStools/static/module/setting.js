@@ -186,6 +186,7 @@ export const redirectOptions = [
 export const omniboxCallback = {
     currencyTrans: {
         onInputChanged: async (text, suggest) => {
+            // api site: https://app.exchangerate-api.com/dashboard/confirmed
             const exangeKey = key["exchangerate-api.com"];
             if (!exangeKey) {
                 suggest([
