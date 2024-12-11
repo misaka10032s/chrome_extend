@@ -52,6 +52,10 @@
     - 作用於page
     - 下載pixiv所有圖片
     - 僅在pixiv網域出現
+15. 移除iopenmall R18遮擋圖
+    - 作用於page
+    - 移除iopenmall R18遮擋圖
+    - 僅在iopenmall網域出現
 
 
 # redirectOptions功能

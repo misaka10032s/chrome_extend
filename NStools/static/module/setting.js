@@ -149,6 +149,16 @@ export const contextMenus = {
         },
         documentUrlPatterns: ["https://www.pixiv.net/artworks/*"]
     },
+    removeR18imgiopenmall: {
+        title: "移除R18遮擋圖",
+        contexts: ["page"],
+        script: async (info, tab) => {
+            await executeScript(tab.id, async (info, tab) => {
+                [...document.querySelectorAll(".img_eighteen_only")].forEach(x => x.remove());
+            });
+        },
+        documentUrlPatterns: ["https://mall.iopenmall.tw/*", "https://www.iopenmall.com/*"]
+    },
 };
 
 // ########################################################
