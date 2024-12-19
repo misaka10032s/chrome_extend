@@ -1,5 +1,5 @@
 import { tabStore } from "./store.js";
-import { downloadImages } from "./methods.js";
+import { downloadImages } from "./core.js";
 /*
     reloadImage: reload all images which loaded failure on the page
     anitWhite: remove the site to prevent user select

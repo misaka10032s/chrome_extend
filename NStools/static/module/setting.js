@@ -1,5 +1,5 @@
 import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
-import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./methods.js";
+import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./core.js";
 import { tabVars, storeData } from "./store.js";
 import key from "./../secret/key.js";
 

@@ -1,5 +1,5 @@
 import { contextMenus, redirectOptions, omniboxCallback } from "./static/module/setting.js";
-import { executeScript, getDomain, executeStoreScript, redirectUrl, handleMessage } from "./static/module/methods.js";
+import { executeScript, getDomain, executeStoreScript, redirectUrl, handleMessage } from "./static/module/core.js";
 import { tabStore, tabVars } from "./static/module/store.js";
 import { _initSwal } from "./static/js/sweetalert2@11.js";
 

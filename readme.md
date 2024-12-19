@@ -63,7 +63,7 @@
 2. 把推特網址的t, s從query string移除
 
 
-# omnibox功能
+# omnibox(url搜尋欄位)功能
 1. 在網址列輸入 "ns" 後輸入 <number> <currencyA> to <currencyB> 來查詢匯率 (ex: ns 100 twd to jpy) 支援 NTD(=TWD) 和 RMB(=CNY)
 
 
@@ -92,7 +92,7 @@ export default {
 ## NStools/static/moudle/store.js
 - 儲存一些全域變數
 
-## NStools/static/moudle/methods.js
+## NStools/static/moudle/core.js
 - 核心程式，基本上不會更動
 
 
