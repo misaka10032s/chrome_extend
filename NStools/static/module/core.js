@@ -2,7 +2,7 @@ import { tabVars } from "./store.js";
 
 export const executeScript = async (target, file, ...args) => {
     var tabId;
-    console.log("file", typeof file, file)
+    console.trace("file", typeof file, file)
     // if target is "current", get current tab
     if (target == "current") {
         const [tab] = await chrome.tabs.query({
@@ -54,11 +54,15 @@ export const getDomain = (url) => {
 
 // execute script in obj[key].script and delete obj[key] if obj[key].delete is true
 export const executeStoreScript = async (obj, key, tab) => {
-    if (typeof obj[key].script == "function" || typeof obj[key].script == "string") {
-        await executeScript(tab.id, obj[key].script, tab, ...(obj[key].args ?? []));
+    try {
+        if (typeof obj[key].script == "function" || typeof obj[key].script == "string") {
+            await executeScript(tab.id, obj[key].script, tab, ...(obj[key].args ?? []));
+        }
+    
+        if (obj[key].delete) delete obj[key];
+    } catch (e) {
+        console.error("executeStoreScript error: ", e);
     }
-
-    if (obj[key].delete) delete obj[key];
 }
 
 export const redirectUrl = (options, origUrl) => {

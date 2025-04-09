@@ -86,10 +86,12 @@ export const searchAscii2d = (imgUrl) => {
 }
 
 // @getBahaImg
-export const getBahaImg = (tab) => {
+export const getBahaImg = (tab, actionType=1) => {
     var element = document.cElement;
     const urls = [];
+    const imgEls = [];
 
+    const title = document.querySelector(".c-post__header__title").innerText;
     var article = [];
     // determine get all floors or only the clicked floor
     while(element){// c-article FM-P2
@@ -104,12 +106,52 @@ export const getBahaImg = (tab) => {
     // get baha every floor img
     article.forEach(
         e => [...e.getElementsByTagName("img")].forEach(
-            e2 => urls.push(e2.getAttribute("data-src"))
+            imgEl => {
+                urls.push(imgEl.getAttribute("data-src"));
+                imgEls.push(imgEl);
+            }
         )
     );
     console.log(urls);
-    navigator.clipboard?.writeText && navigator.clipboard.writeText(JSON.stringify(urls));
-    return urls;
+
+    if(actionType & 1) navigator.clipboard?.writeText && navigator.clipboard.writeText(JSON.stringify(urls));
+
+    return {title, urls};
+}
+export const downloadBahaImg = async (tab, title, urls, delay=200) => {
+    for(let index = 0; index < urls.length; index++){
+        const url = urls[index];
+        if(!url) continue;
+
+        console.log(url, index);
+
+        const imageExtension = url.split(".").pop();
+        
+        try{
+            // because maximum 10 download at the same time, so set a delay to prevent overflow
+            await new Promise(resolve => setTimeout(resolve, delay));
+            
+            await fetch(url).then(async r => {
+                const blobUrl = URL.createObjectURL(await r.blob());
+                console.log(blobUrl);
+
+                const anchor = document.createElement("a");
+                anchor.href = blobUrl;
+                anchor.download = `${title}-${index}.${imageExtension}`;
+                document.body.appendChild(anchor);
+
+                anchor.click();
+
+                URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(anchor);
+            });
+        }
+        catch(e){
+            console.error(e);
+            Toast(1500).fire("error", "下載失敗 :(", e);
+        }
+    };
+    await new Promise(resolve => setTimeout(resolve, 500));
 }
 // record the clicked element at bahamut
 tabStore.domains["forum.gamer.com.tw"] = {

@@ -1,4 +1,4 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, downloadBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
 import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./core.js";
 import { tabVars, storeData } from "./store.js";
 import key from "./../secret/key.js";
@@ -120,6 +120,21 @@ export const contextMenus = {
         contexts: ["page"],
         script: async (info, tab) => {
             await executeScript(tab.id, getBahaImg, tab);
+        },
+        documentUrlPatterns: ["https://forum.gamer.com.tw/*"]
+    },
+    downloadBahaImg: {
+        title: "下載巴哈姆特圖片",
+        contexts: ["page"],
+        script: async (info, tab) => {
+           const {urls: imageUrls, title} = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
+           const newTab = await chrome.tabs.create({
+                url: imageUrls[0],
+                index: tab.index + 1
+            });
+            await executeScript(newTab.id, downloadBahaImg, tab, title, imageUrls);
+            // close the opened tab
+            newTab && chrome.tabs.remove(newTab.id);
         },
         documentUrlPatterns: ["https://forum.gamer.com.tw/*"]
     },
