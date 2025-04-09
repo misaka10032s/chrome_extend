@@ -16,6 +16,8 @@ export const executeScript = async (target, file, ...args) => {
     }
     else tabId = target;
 
+    if(!await checkTabById(tabId)) return;
+
     // if file is string, execute file
     if (typeof file == "string") {
         return await chrome.scripting.executeScript({
@@ -54,6 +56,8 @@ export const getDomain = (url) => {
 
 // execute script in obj[key].script and delete obj[key] if obj[key].delete is true
 export const executeStoreScript = async (obj, key, tab) => {
+    if(!await checkTabById(tab?.id)) return;
+    
     try {
         if (typeof obj[key].script == "function" || typeof obj[key].script == "string") {
             await executeScript(tab.id, obj[key].script, tab, ...(obj[key].args ?? []));
@@ -159,6 +163,7 @@ export const injectScript = async (tabID, file) => {
     }
 }
 
+// deprecated
 // download images
 export const downloadImages = async (images) => {
     console.log('chrome.downloads', chrome.downloads, images)
@@ -168,4 +173,18 @@ export const downloadImages = async (images) => {
             filename: image.split("/").pop()
         });
     });
+}
+
+// check if tab is exist
+export const checkTabById = async (tabId) => {
+    try{
+        const tab = await chrome.tabs.get(tabId);
+        if (!tab) {
+            console.warn("tab not exist", tabId);
+            return false;
+        }
+        return true;
+    } catch(e){
+        return false;
+    }
 }

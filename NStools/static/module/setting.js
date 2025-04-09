@@ -1,4 +1,4 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, downloadBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, downloadMultipleImgs, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
 import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./core.js";
 import { tabVars, storeData } from "./store.js";
 import key from "./../secret/key.js";
@@ -127,12 +127,12 @@ export const contextMenus = {
         title: "下載巴哈姆特圖片",
         contexts: ["page"],
         script: async (info, tab) => {
-           const {urls: imageUrls, title} = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
+           const {imgUrls, title} = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
            const newTab = await chrome.tabs.create({
-                url: imageUrls[0],
+                url: imgUrls[0],
                 index: tab.index + 1
             });
-            await executeScript(newTab.id, downloadBahaImg, tab, title, imageUrls);
+            await executeScript(newTab.id, downloadMultipleImgs, tab, title, imgUrls);
             // close the opened tab
             newTab && chrome.tabs.remove(newTab.id);
         },
@@ -157,10 +157,16 @@ export const contextMenus = {
     },
     getPixivAllImg: {
         title: "pixiv: 下載所有圖片",
-        contexts: ["image"],
+        contexts: ["page"],
         script: async (info, tab) => {
-            const images = await executeScript(tab.id, getPixivAllImg, info);
-            await downloadImages(images[0].result);
+            const {imgUrls, title} = (await executeScript(tab.id, getPixivAllImg, info))[0].result;
+            const newTab = await chrome.tabs.create({
+                 url: imgUrls[0],
+                 index: tab.index + 1
+             });
+            await executeScript(newTab.id, downloadMultipleImgs, tab, title, imgUrls);
+            // close the opened tab
+            newTab && chrome.tabs.remove(newTab.id);
         },
         documentUrlPatterns: ["https://www.pixiv.net/artworks/*"]
     },

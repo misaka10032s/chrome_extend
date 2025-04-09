@@ -88,7 +88,7 @@ export const searchAscii2d = (imgUrl) => {
 // @getBahaImg
 export const getBahaImg = (tab, actionType=1) => {
     var element = document.cElement;
-    const urls = [];
+    const imgUrls = [];
     const imgEls = [];
 
     const title = document.querySelector(".c-post__header__title").innerText;
@@ -107,51 +107,16 @@ export const getBahaImg = (tab, actionType=1) => {
     article.forEach(
         e => [...e.getElementsByTagName("img")].forEach(
             imgEl => {
-                urls.push(imgEl.getAttribute("data-src"));
+                imgUrls.push(imgEl.getAttribute("data-src"));
                 imgEls.push(imgEl);
             }
         )
     );
-    console.log(urls);
+    console.log(imgUrls);
 
-    if(actionType & 1) navigator.clipboard?.writeText && navigator.clipboard.writeText(JSON.stringify(urls));
+    if(actionType & 1) navigator.clipboard?.writeText && navigator.clipboard.writeText(JSON.stringify(imgUrls));
 
-    return {title, urls};
-}
-export const downloadBahaImg = async (tab, title, urls, delay=200) => {
-    for(let index = 0; index < urls.length; index++){
-        const url = urls[index];
-        if(!url) continue;
-
-        console.log(url, index);
-
-        const imageExtension = url.split(".").pop();
-        
-        try{
-            // because maximum 10 download at the same time, so set a delay to prevent overflow
-            await new Promise(resolve => setTimeout(resolve, delay));
-            
-            await fetch(url).then(async r => {
-                const blobUrl = URL.createObjectURL(await r.blob());
-                console.log(blobUrl);
-
-                const anchor = document.createElement("a");
-                anchor.href = blobUrl;
-                anchor.download = `${title}-${index}.${imageExtension}`;
-                document.body.appendChild(anchor);
-
-                anchor.click();
-
-                URL.revokeObjectURL(blobUrl);
-                document.body.removeChild(anchor);
-            });
-        }
-        catch(e){
-            console.error(e);
-            Toast(1500).fire("error", "下載失敗 :(", e);
-        }
-    };
-    await new Promise(resolve => setTimeout(resolve, 500));
+    return {title, imgUrls};
 }
 // record the clicked element at bahamut
 tabStore.domains["forum.gamer.com.tw"] = {
@@ -231,11 +196,14 @@ export const getPixivAllImg = async (info) => {
     // page url: https://www.pixiv.net/artworks/123793853
     // image url: https://i.pximg.net/img-original/img/2024/10/29/21/21/19/123793853_p0.jpg
 
+    // title class: sc-a2ee6855-3 kQqnJS
+    const title = document.querySelector(".sc-a2ee6855-3.kQqnJS").innerText;
+
     // get image url
     const imageNumber = info.frameUrl.split("/").pop();
     // get image number
-    const images = [...document.querySelectorAll("a")].map(e => e.href).filter(e => e.includes(imageNumber)).filter(e => e.includes("i.pximg.net"));
-    return images;
+    const imgUrls = [...document.querySelectorAll("a")].map(e => e.href).filter(e => e.includes(imageNumber)).filter(e => e.includes("i.pximg.net"));
+    return {imgUrls, title};
 }
 
 tabStore.always.push({
@@ -246,3 +214,40 @@ tabStore.always.push({
         })
     }
 })
+
+// download mulpiple images
+export const downloadMultipleImgs = async (tab, title, urls, delay=200) => {
+    for(let index = 0; index < urls.length; index++){
+        const url = urls[index];
+        if(!url) continue;
+
+        console.log(url, index);
+
+        const imageExtension = url.split(".").pop();
+        
+        try{
+            // because maximum 10 download at the same time, so set a delay to prevent overflow
+            await new Promise(resolve => setTimeout(resolve, delay));
+            
+            await fetch(url).then(async r => {
+                const blobUrl = URL.createObjectURL(await r.blob());
+                console.log(blobUrl);
+
+                const anchor = document.createElement("a");
+                anchor.href = blobUrl;
+                anchor.download = `${title}-${index}.${imageExtension}`;
+                document.body.appendChild(anchor);
+
+                anchor.click();
+
+                URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(anchor);
+            });
+        }
+        catch(e){
+            console.error(e);
+            Toast(1500).fire("error", "下載失敗 :(", e);
+        }
+    };
+    await new Promise(resolve => setTimeout(resolve, 500));
+}
