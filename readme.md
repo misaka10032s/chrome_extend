@@ -41,18 +41,22 @@
     - 作用於page
     - 取得巴哈姆特文章圖片連結，並存在剪貼簿
     - 僅在巴哈姆特網域出現
-12. 匯出chatGPT圖片
+12. 下載巴哈姆特圖片
+    - 作用於page
+    - 取得巴哈姆特文章圖片連結，並一次下載
+    - 僅在巴哈姆特網域出現
+13. 匯出chatGPT圖片
     - 作用於page
     - 匯出chatGPT聊天為圖片
     - 僅在chatGPT網域出現
-13. 解析QRcode
+14. 解析QRcode
     - 作用於image
     - 解析QRcode出現在右上方sweetalert toast對話框 可以複製文字
-14. pixiv: 下載所有圖片 (目前無法使用)
+15. pixiv: 下載所有圖片
     - 作用於page
     - 下載pixiv所有圖片
     - 僅在pixiv網域出現
-15. 移除iopenmall R18遮擋圖
+16. 移除iopenmall R18遮擋圖
     - 作用於page
     - 移除iopenmall R18遮擋圖
     - 僅在iopenmall網域出現
@@ -81,13 +85,16 @@ export default {
 
 
 # for developers
-## NStools/static/moudle/settings.js
+## NStools/static/moudle/menu.js
 - contextMenus: 設定右鍵選單
 - redirectOptions: 設定網址導向(不會重新整理)
 
-## NStools/static/moudle/script.js
-- 實作settings.js的功能
-- 為了讓settings.js更為簡潔
+## NStools/static/moudle/menu.js
+- 實作menu.js的功能
+- 為了讓menu.js更為簡潔
+
+## NStools/static/moudle/utils.js
+- 一些共用的function，給menu.js使用
 
 ## NStools/static/moudle/store.js
 - 儲存一些全域變數

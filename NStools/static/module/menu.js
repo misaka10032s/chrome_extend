@@ -1,7 +1,8 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, downloadMultipleImgs, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
+import { downloadMultipleImgs } from "./utils.js";
 import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./core.js";
 import { tabVars, storeData } from "./store.js";
-import key from "./../secret/key.js";
+import key from "../secret/key.js";
 
 // ########################################################
 // #                                                      #
