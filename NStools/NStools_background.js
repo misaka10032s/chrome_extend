@@ -2,6 +2,7 @@ import { contextMenus, redirectOptions, omniboxCallback } from "./static/module/
 import { executeScript, getDomain, executeStoreScript, redirectUrl, handleMessage } from "./static/module/core.js";
 import { tabStore, tabVars } from "./static/module/store.js";
 import { _initSwal } from "./static/js/sweetalert2@11.js";
+import { useUtils } from "./static/module/utils.js";
 
 // ########################################################
 // ######################### menus ########################
@@ -72,6 +73,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
         tabVars[tabId] = {};
         executeScript(tabId, _initSwal);
         executeScript(tabId, handleMessage);
+        executeScript(tabId, useUtils, true);
     }
 });
 

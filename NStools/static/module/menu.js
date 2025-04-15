@@ -1,5 +1,5 @@
 import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
-import { downloadMultipleImgs } from "./utils.js";
+import { useUtils } from "./utils.js";
 import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./core.js";
 import { tabVars, storeData } from "./store.js";
 import key from "../secret/key.js";
@@ -98,11 +98,15 @@ export const contextMenus = {
         title: "使用 saucenao搜尋圖片", // https://saucenao.com
         contexts: ["image"],
         script: async (info, tab) => {
+            const { copyImageToClipboard, pasteImage } = useUtils();
+            await injectScript(tab.id, "html2canvas.js");
+            await executeScript(tab.id, copyImageToClipboard, info.srcUrl);
             const newTab = await chrome.tabs.create({
                 url: "https://saucenao.com/",
                 index: tab.index + 1
             });
-            await executeScript(newTab.id, searchSaucenao, info.srcUrl);
+            await executeScript(newTab.id, pasteImage, "#fileInput");
+            await executeScript(newTab.id, searchSaucenao);
         }
     },
     imageAscii2d: {
@@ -128,11 +132,12 @@ export const contextMenus = {
         title: "下載巴哈姆特圖片",
         contexts: ["page"],
         script: async (info, tab) => {
-           const {imgUrls, title} = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
-           const newTab = await chrome.tabs.create({
+            const {imgUrls, title} = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
+            const newTab = await chrome.tabs.create({
                 url: imgUrls[0],
                 index: tab.index + 1
             });
+            const { downloadMultipleImgs } = useUtils();
             await executeScript(newTab.id, downloadMultipleImgs, tab, title, imgUrls);
             // close the opened tab
             newTab && chrome.tabs.remove(newTab.id);
@@ -164,7 +169,8 @@ export const contextMenus = {
             const newTab = await chrome.tabs.create({
                  url: imgUrls[0],
                  index: tab.index + 1
-             });
+            });
+            const { downloadMultipleImgs } = useUtils();
             await executeScript(newTab.id, downloadMultipleImgs, tab, title, imgUrls);
             // close the opened tab
             newTab && chrome.tabs.remove(newTab.id);

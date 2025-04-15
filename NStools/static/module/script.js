@@ -1,5 +1,6 @@
 import { tabStore } from "./store.js";
 import { downloadImages } from "./core.js";
+import { useUtils } from "./utils.js";
 /*
     reloadImage: reload all images which loaded failure on the page
     anitWhite: remove the site to prevent user select
@@ -73,9 +74,9 @@ export const navigation = (input) => {
 }
 
 // @searchSaucenao
-export const searchSaucenao = (imgUrl) => {
-    document.getElementById("urlInput").value = imgUrl;
-    document.getElementById("urlInput").dispatchEvent(new CustomEvent("blur"));
+export const searchSaucenao = () => {
+    // document.getElementById("urlInput").value = imgUrl;
+    // document.getElementById("urlInput").dispatchEvent(new CustomEvent("blur"));
     document.getElementById("searchButton").click();
 }
 
@@ -114,7 +115,8 @@ export const getBahaImg = (tab, actionType=1) => {
     );
     console.log(imgUrls);
 
-    if(actionType & 1) navigator.clipboard?.writeText && navigator.clipboard.writeText(JSON.stringify(imgUrls));
+    const { copyTextToClipboard } = useUtils();
+    if(actionType & 1) copyTextToClipboard(JSON.stringify(imgUrls));
 
     return {title, imgUrls};
 }
@@ -160,6 +162,7 @@ export const exportChatGPTConversation = () => {
 // qrcode decoder
 export const deQrcode = async () => {
     const image = document.clickedImage;
+    const { copyTextToClipboard } = useUtils();
 
     fetch(image.src).then(async r => {
         const image2 = new Image();
@@ -168,7 +171,7 @@ export const deQrcode = async () => {
         image2.onload = () => {
             const qrcode = new QrcodeDecoder();
             qrcode.decodeFromImage(image2).then(result => {
-                result.data && navigator.clipboard?.writeText && navigator.clipboard.writeText(result.data);
+                result.data && copyTextToClipboard(result.data);
                 const status = result.data ? "解析成功" : "解析失敗";
                 Toast(3000).fire(status, result.data ?? "");
             });
@@ -184,7 +187,7 @@ export const deQrcode = async () => {
     //     try{
     //         qrcode.decodeFromImage(image).then(result => {
     //             // console.log(result);
-    //             result.data && navigator.clipboard?.writeText && navigator.clipboard.writeText(result.data);
+    //             result.data && copyTextToClipboard(result.data);
     //             const status = result.data ? "解析成功" : "解析失敗";
     //             Toast(3000).fire(status, result.data ?? "");
     //         });
