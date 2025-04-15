@@ -74,16 +74,40 @@ export const navigation = (input) => {
 }
 
 // @searchSaucenao
-export const searchSaucenao = () => {
-    // document.getElementById("urlInput").value = imgUrl;
-    // document.getElementById("urlInput").dispatchEvent(new CustomEvent("blur"));
-    document.getElementById("searchButton").click();
+export const searchSaucenao = {
+    img2Base64: async (imgUrl) => {
+        return await image2Base64(imgUrl);
+    },
+    addUrl: (imgUrl) => {
+        document.getElementById("urlInput").value = imgUrl;
+        document.getElementById("urlInput").dispatchEvent(new CustomEvent("blur"));
+        document.getElementById("searchButton").click();
+    },
+    addBlob: (base64) => {
+        pasteFile("#fileInput", base64, "image.png", "image/png").then(() => {
+            setTimeout(() => {
+                 document.getElementById("searchButton").click();
+            }, 50);
+        });
+    }
 }
 
 // @searchAscii2d
-export const searchAscii2d = (imgUrl) => {
-    document.getElementById("uri-form").value = imgUrl;
-    document.getElementById("uri-form").parentElement.nextElementSibling.children[0].click();
+export const searchAscii2d = {
+    img2Base64: async (imgUrl) => {
+        return await image2Base64(imgUrl);
+    },
+    addUrl: (imgUrl) => {
+        document.getElementById("uri-form").value = imgUrl;
+        document.getElementById("uri-form").parentElement.nextElementSibling.children[0].click();
+    },
+    addBlob: (base64) => {
+        pasteFile("#file-form", base64, "image.png", "image/png").then(() => {
+            setTimeout(() => {
+                document.getElementById("file-form").parentElement.nextElementSibling.children[0].click();
+            }, 50);
+        });
+    }
 }
 
 // @getBahaImg

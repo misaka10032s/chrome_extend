@@ -1,6 +1,6 @@
 
 
-export const useUtils = (init = false) => {
+export const useUtils = (install = false) => {
     // download mulpiple images
     const downloadMultipleImgs = async (tab, title, urls, delay=200) => {
         for(let index = 0; index < urls.length; index++){
@@ -76,7 +76,8 @@ export const useUtils = (init = false) => {
             reader.onerror = () => reject("Error reading the Blob as Base64");
             reader.readAsDataURL(blob);
         });
-        Toast(1500).fire("success", base64);
+
+        console.log("Base64 string:", base64);
         return base64;
     }
 
@@ -93,11 +94,11 @@ export const useUtils = (init = false) => {
             // Write the ClipboardItem to the clipboard
             await navigator.clipboard.write([clipboardItem]);
 
-            // console.log("Image copied to clipboard successfully!");
-            Toast(1500).fire("success", "圖片已複製到剪貼簿 :)");
+            console.log("Image copied to clipboard successfully!");
+            // Toast(1500).fire("success", "圖片已複製到剪貼簿 :)");
         } catch (error) {
-            // console.error("Error copying image to clipboard:", error);
-            Toast(1500).fire("error", "複製失敗 :(", error);
+            console.error("Error copying image to clipboard:", error);
+            // Toast(1500).fire("error", "複製失敗 :(", error);
         }
     }
 
@@ -105,41 +106,102 @@ export const useUtils = (init = false) => {
     const copyTextToClipboard = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
-            // console.log("Text copied to clipboard successfully!");
-            Toast(1500).fire("success", "文字已複製到剪貼簿 :)");
+            console.log("Text copied to clipboard successfully!");
+            // Toast(1500).fire("success", "文字已複製到剪貼簿 :)");
         } catch (error) {
-            // console.error("Error copying text to clipboard:", error);
-            Toast(1500).fire("error", "複製失敗 :(", error);
+            console.error("Error copying text to clipboard:", error);
+            // Toast(1500).fire("error", "複製失敗 :(", error);
         }
     }
 
+    const getDataFromClipboard = async (...type) => {
+        const clipboardItems = await navigator.clipboard.read();
+        for (const item of clipboardItems) {
+            for (const t of type) {
+                if (item.types.includes(t)) {
+                    return await item.getType(t);
+                }
+            }
+        }
+    }
+
+    // get image from clipboard
+    const getImageFromClipboard = async (type="png") => {
+        return await getDataFromClipboard(`image/${ type }`);
+    }
+
+    // get text from clipboard
+    const getTextFromClipboard = async () => {
+        return await getDataFromClipboard("text/plain");
+    }
+
     // dispatch paste event
-    const pasteImage = async (target, type="png") => {
-        if (!target) target=document;
+    // accept file or image as blob
+    const pasteFile = async (target, blobData, name, fullType) => {
+        if (!target) target=document.body;
         else if(typeof target === "string") target = document.querySelector(target);
 
         if(!target) return;
 
-        const clipboardItems = await navigator.clipboard.read();
-        for (const item of clipboardItems) {
-            if (item.types.includes(`image/${ type }`)) {
-                const blob = await item.getType(`image/${ type }`); // Prefer PNG if available
-
-                // make sure pasteEvent.clipboardData.files[0] is a blob
-                const file = new File([blob], `image.${ type }`, { type: `image/${ type }` });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                const pasteEvent = new ClipboardEvent('paste', {
-                    bubbles: true,
-                    cancelable: true,
-                    clipboardData: dataTransfer
-                });
-                target.dispatchEvent(pasteEvent);
-
-                console.log("Image pasted from clipboard successfully!");
-                return;
+        const subType = fullType.split("/")[1];
+        if (!blobData) blobData = await getImageFromClipboard(subType);
+        else if (typeof blobData === "string") {
+            // transform base64 string to blob
+            const base64 = blobData.split(",")[1];
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
+            const byteArray = new Uint8Array(byteNumbers);
+            blobData = new Blob([byteArray], { type: fullType });
         }
+
+        // if target is input[type="file"], add file to input not dispatch paste event
+        if (target.tagName.toLowerCase() === "input" && target.type === "file") {
+            const file = new File([blobData], `${ name }.${ subType }`, { type: fullType });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            target.files = dataTransfer.files;
+            target.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log("File added to input successfully!");
+            return;
+        }
+
+        const file = new File([blobData], `${ name }.${ subType }`, { type: fullType });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer
+        });
+        target.dispatchEvent(pasteEvent);
+
+        console.log("Image pasted successfully!");
+        return;
+    }
+
+    // dispatch paste event
+    // accept text as string
+    const pasteText = async (target, text) => {
+        if (!target) target=document.body;
+        else if(typeof target === "string") target = document.querySelector(target);
+
+        if(!target) return;
+        if (!text) text = await getTextFromClipboard();
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.setData("text/plain", text);
+        const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer
+        });
+        target.dispatchEvent(pasteEvent);
+
+        console.log("Text pasted successfully!");
+        return;
     }
 
     const data = {
@@ -149,11 +211,14 @@ export const useUtils = (init = false) => {
         image2Base64,
         copyImageToClipboard,
         copyTextToClipboard,
-        pasteImage
+        getImageFromClipboard,
+        getTextFromClipboard,
+        pasteFile,
+        pasteText,
     };
 
-    if(init) {
-        // init all utils
+    if(install) {
+        // install all utils to window
         for (const key in data) {
             window[key] = data[key];
         }

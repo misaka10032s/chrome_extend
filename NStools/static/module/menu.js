@@ -98,26 +98,32 @@ export const contextMenus = {
         title: "使用 saucenao搜尋圖片", // https://saucenao.com
         contexts: ["image"],
         script: async (info, tab) => {
-            const { copyImageToClipboard, pasteImage } = useUtils();
-            await injectScript(tab.id, "html2canvas.js");
-            await executeScript(tab.id, copyImageToClipboard, info.srcUrl);
+            const isBlob = info.srcUrl.startsWith("blob:");
+
+            await executeScript(tab.id, useUtils, true);
+            const base64 = isBlob ? (await executeScript(tab.id, searchSaucenao.img2Base64, info.srcUrl))[0].result : info.srcUrl;
             const newTab = await chrome.tabs.create({
                 url: "https://saucenao.com/",
                 index: tab.index + 1
             });
-            await executeScript(newTab.id, pasteImage, "#fileInput");
-            await executeScript(newTab.id, searchSaucenao);
+            await executeScript(newTab.id, useUtils, true);
+            await executeScript(newTab.id, isBlob ? searchSaucenao.addBlob : searchSaucenao.addUrl, base64);
         }
     },
     imageAscii2d: {
         title: "使用 ascii2d搜尋圖片", // https://ascii2d.net
         contexts: ["image"],
         script: async (info, tab) => {
+            const isBlob = info.srcUrl.startsWith("blob:");
+
+            await executeScript(tab.id, useUtils, true);
+            const base64 = isBlob ? (await executeScript(tab.id, searchAscii2d.img2Base64, info.srcUrl))[0].result : info.srcUrl;
             const newTab = await chrome.tabs.create({
                 url: "https://ascii2d.net/",
                 index: tab.index + 1
             });
-            await executeScript(newTab.id, searchAscii2d, info.srcUrl);
+            await executeScript(newTab.id, useUtils, true);
+            await executeScript(newTab.id, isBlob ? searchAscii2d.addBlob : searchAscii2d.addUrl, base64);
         }
     },
     getBahaImg: {
