@@ -86,7 +86,7 @@ export const contextMenus = {
         title: "前往: %s",
         contexts: ["selection"],
         script: async (info, tab) => {
-            const rmw = info.selectionText.replace(/[\s]*/g, "");
+            const rmw = info.selectionText.replace(/[\s]*/g, "").replace(/[\.]{2,}/g, ".");
             const target = rmw.match(/^https?:\/\//) ? rmw : `https://${ rmw }`;
             await chrome.tabs.create({
                 url: target,
@@ -138,13 +138,13 @@ export const contextMenus = {
         title: "下載巴哈姆特圖片",
         contexts: ["page"],
         script: async (info, tab) => {
-            const {imgUrls, title} = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
+            const urlsObjects = (await executeScript(tab.id, getBahaImg, tab, 2))[0].result;
             const newTab = await chrome.tabs.create({
-                url: imgUrls[0],
+                url: urlsObjects[0].url,
                 index: tab.index + 1
             });
             const { downloadMultipleImgs } = useUtils();
-            await executeScript(newTab.id, downloadMultipleImgs, tab, title, imgUrls);
+            await executeScript(newTab.id, downloadMultipleImgs, tab, urlsObjects);
             // close the opened tab
             newTab && chrome.tabs.remove(newTab.id);
         },
@@ -171,13 +171,13 @@ export const contextMenus = {
         title: "pixiv: 下載所有圖片",
         contexts: ["page"],
         script: async (info, tab) => {
-            const {imgUrls, title} = (await executeScript(tab.id, getPixivAllImg, info))[0].result;
+            const urlsObjects = (await executeScript(tab.id, getPixivAllImg, info))[0].result;
             const newTab = await chrome.tabs.create({
-                 url: imgUrls[0],
+                url: urlsObjects[0].url,
                  index: tab.index + 1
             });
             const { downloadMultipleImgs } = useUtils();
-            await executeScript(newTab.id, downloadMultipleImgs, tab, title, imgUrls);
+            await executeScript(newTab.id, downloadMultipleImgs, tab, urlsObjects);
             // close the opened tab
             newTab && chrome.tabs.remove(newTab.id);
         },

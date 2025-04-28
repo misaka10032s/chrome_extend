@@ -142,7 +142,13 @@ export const getBahaImg = (tab, actionType=1) => {
     const { copyTextToClipboard } = useUtils();
     if(actionType & 1) copyTextToClipboard(JSON.stringify(imgUrls));
 
-    return {title, imgUrls};
+    return imgUrls.map((e, i) => {
+        const imgExtension = e.split(".").pop();
+        return {
+            url: e,
+            title: `${title}-${i}.${imgExtension}`,
+        }
+    }).filter(e => e.url != null);
 }
 // record the clicked element at bahamut
 tabStore.domains["forum.gamer.com.tw"] = {
@@ -227,13 +233,19 @@ export const getPixivAllImg = async (info) => {
     // image url: https://i.pximg.net/img-original/img/2024/10/29/21/21/19/123793853_p0.jpg
 
     // title class: sc-a2ee6855-3 kQqnJS
-    const title = document.querySelector(".sc-a2ee6855-3.kQqnJS").innerText;
+    // const title = document.querySelector(".sc-a2ee6855-3.kQqnJS").innerText;
 
     // get image url
     const imageNumber = info.frameUrl.split("/").pop();
     // get image number
     const imgUrls = [...document.querySelectorAll("a")].map(e => e.href).filter(e => e.includes(imageNumber)).filter(e => e.includes("i.pximg.net"));
-    return {imgUrls, title};
+    return imgUrls.map((e, i) => {
+        const imgExtension = e.split(".").pop();
+        return {
+            url: e,
+            title: `${imageNumber}p${i}.${imgExtension}`,
+        }
+    });
 }
 
 tabStore.always.push({

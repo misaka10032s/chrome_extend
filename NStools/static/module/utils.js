@@ -2,23 +2,21 @@
 
 export const useUtils = (install = false) => {
     // download mulpiple images
-    const downloadMultipleImgs = async (tab, title, urls, delay=200) => {
-        for(let index = 0; index < urls.length; index++){
-            const url = urls[index];
-            if(!url) continue;
-
-            const imageExtension = url.split(".").pop();
+    const downloadMultipleImgs = async (tab, urlsObjects, delay=200) => {
+        for(let index = 0; index < urlsObjects.length; index++){
+            const urlsObject = urlsObjects[index];
+            if(!urlsObject) continue;
             
             try{
                 // because maximum 10 download at the same time, so set a delay to prevent overflow
                 await new Promise(resolve => setTimeout(resolve, delay));
                 
-                await fetch(url).then(async r => {
+                await fetch(urlsObject.url).then(async r => {
                     const blobUrl = URL.createObjectURL(await r.blob());
 
                     const anchor = document.createElement("a");
                     anchor.href = blobUrl;
-                    anchor.download = `${title}-${index}.${imageExtension}`;
+                    anchor.download = urlsObject.title;
                     document.body.appendChild(anchor);
 
                     anchor.click();
