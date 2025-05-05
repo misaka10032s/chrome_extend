@@ -248,11 +248,24 @@ export const getPixivAllImg = async (info) => {
     });
 }
 
+export const openBackgroundImageInNewTab = (info) => {
+    const selectedObjects = document.clickedElements;
+    
+    const imageDiv = selectedObjects.filter(e => window.getComputedStyle(e).backgroundImage != "none")[0];
+
+    if(!imageDiv) return;
+    const bgImage = window.getComputedStyle(imageDiv).backgroundImage;
+
+    const url = bgImage.replace(/url\(["']?/, "").replace(/["']?\)/, "");
+    return url;
+}
+
 tabStore.always.push({
     script: (tab) => {
         document.addEventListener("contextmenu", e => {
-            const ele = document.elementFromPoint(e.x, e.y);
-            if(ele instanceof Image) document.clickedImage = ele;
+            const eles = document.elementsFromPoint(e.x, e.y);
+            document.clickedImage = eles.filter(e => e instanceof Image && e.src)[0];
+            document.clickedElements = eles;
         })
     }
 })

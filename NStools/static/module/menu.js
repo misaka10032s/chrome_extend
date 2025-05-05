@@ -1,4 +1,4 @@
-import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg } from "./script.js";
+import { reloadImage, anitWhite, navigation, searchSaucenao, searchAscii2d, getBahaImg, exportChatGPTConversation, deQrcode, getPixivAllImg, openBackgroundImageInNewTab } from "./script.js";
 import { useUtils } from "./utils.js";
 import { executeScript, getDomain, executeStoreScript, injectScript, downloadImages } from "./core.js";
 import { tabVars, storeData } from "./store.js";
@@ -193,6 +193,19 @@ export const contextMenus = {
         },
         documentUrlPatterns: ["https://mall.iopenmall.tw/*", "https://www.iopenmall.com/*"]
     },
+    openBackgroundImageInNewTab: {
+        title: "在新分頁開啟背景圖片",
+        contexts: ["all"],
+        script: async (info, tab) => {
+            const url = (await executeScript(tab.id, openBackgroundImageInNewTab, info))[0].result;
+            console.log("url: ", url, url ? 1:0);
+            if (!url) return;
+            await chrome.tabs.create({
+                url: url,
+                index: tab.index + 1
+            });
+        }
+    }
 };
 
 // ########################################################
