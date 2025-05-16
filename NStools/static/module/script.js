@@ -69,7 +69,7 @@ export const navigation = (input) => {
         const numberValue = parseInt(number);
         if(number.length == 6) goto("n");
         else if(number.length == 5) goto("w");
-        else if(1E7 < numberValue && numberValue < 1.3E8) goto("p");
+        else if(1E7 < numberValue && numberValue < 1.3E9) goto("p");
     }
 }
 
