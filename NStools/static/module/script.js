@@ -110,6 +110,22 @@ export const searchAscii2d = {
     }
 }
 
+// @searchTraceMoe
+export const searchTraceMoe = {
+    img2Base64: async (imgUrl) => {
+        return await image2Base64(imgUrl);
+    },
+    addUrl: (imgUrl) => {
+        const input = document.querySelector("input[type='url']");
+        input.value = imgUrl;
+        // dispatch input event
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    },
+    addBlob: (base64) => {
+        pasteFile("input[type='url']", base64, "image.png", "image/png")
+    }
+}
+
 // @getBahaImg
 export const getBahaImg = (tab, actionType=1) => {
     var element = document.cElement;
@@ -243,7 +259,7 @@ export const getPixivAllImg = async (info) => {
         const imgExtension = e.split(".").pop();
         return {
             url: e,
-            title: `${imageNumber}p${i}.${imgExtension}`,
+            title: `${imageNumber}_p${i}.${imgExtension}`,
         }
     });
 }
