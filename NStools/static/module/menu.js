@@ -195,7 +195,7 @@ export const contextMenus = {
             const { downloadMultipleImgs } = useUtils();
             await executeScript(newTab.id, downloadMultipleImgs, tab, urlsObjects);
             // close the opened tab
-            // newTab && chrome.tabs.remove(newTab.id);
+            newTab && chrome.tabs.remove(newTab.id);
         },
         documentUrlPatterns: ["https://www.pixiv.net/artworks/*"]
     },
@@ -221,6 +221,46 @@ export const contextMenus = {
                 index: tab.index + 1
             });
         }
+    },
+    ytdlp: {
+        title: "使用 yt-dlp 下載",
+        contexts: ["selection", "link", "page"],
+        script: async (info, tab) => {
+            chrome.runtime.sendNativeMessage("com.ns.listener", {
+                command: "ytdlp",
+                link: info.selectionText || info.linkUrl || tab.url,
+            })
+        },
+        documentUrlPatterns: [
+            "https://www.youtube.com/*",
+            "https://www.facebook.com/reel/*",
+            "https://www.facebook.com/watch/*"
+        ]
+    },
+    // 手機板轉為桌面版區，以後可能要獨立出來
+    taobaoMobile2Desktop: {
+        title: "淘寶轉為桌面版",
+        contexts: ["page"],
+        script: async (info, tab) => {
+            // https://m.intl.taobao.com/detail/detail.html?id=906139554065
+            // to
+            // https://item.taobao.com/item.htm?id=906139554065
+            const url = tab.url.replace("m.intl.taobao.com/detail/detail.html", "item.taobao.com/item.htm");
+            await chrome.tabs.update(tab.id, { url });
+        },
+        documentUrlPatterns: ["https://m.intl.taobao.com/*"]
+    },
+    bahaMobile2Desktop: {
+        title: "巴哈姆特轉為桌面版",
+        contexts: ["page"],
+        script: async (info, tab) => {
+            // https://m.gamer.com.tw/forum
+            // to
+            // https://forum.gamer.com.tw/
+            const url = tab.url.replace("m.gamer.com.tw/forum", "forum.gamer.com.tw");
+            await chrome.tabs.update(tab.id, { url });
+        },
+        documentUrlPatterns: ["https://m.gamer.com.tw/*"]
     }
 };
 

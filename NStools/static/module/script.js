@@ -276,7 +276,7 @@ export const openBackgroundImageInNewTab = (info) => {
     return url;
 }
 
-tabStore.always.push({
+tabStore.always.push(...[{
     script: (tab) => {
         document.addEventListener("contextmenu", e => {
             const eles = document.elementsFromPoint(e.x, e.y);
@@ -284,4 +284,6 @@ tabStore.always.push({
             document.clickedElements = eles;
         })
     }
-})
+}, {
+    script: anitWhite
+}])

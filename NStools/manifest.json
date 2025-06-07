@@ -15,7 +15,8 @@
         "scripting",
         "storage",
         "webNavigation",
-        "downloads"
+        "downloads",
+        "nativeMessaging"
     ],
     "host_permissions": [
         "http://*/*",

@@ -38,7 +38,8 @@ chrome.contextMenus.onClicked.addListener(
         if (info.menuItemId in contextMenus) {
             await contextMenus[info.menuItemId].script(info, tab);
         }
-    });
+    }
+);
 
 // onUpdated listener
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {

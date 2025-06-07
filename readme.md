@@ -114,3 +114,90 @@ export default {
 
 ## NStools/static/js/sweetalert2@11.js
 - 顯示toast的外部程式庫
+
+
+
+
+
+
+
+# 開啟應用程式設定步驟
+
+> manifest.json 需要權限: nativeMessaging
+
+幾個自定義變數
+- <route-to-native-messaging-host.json>：Native Messaging Host 的設定檔
+- <com.mycompany.exelauncher>：Native Messaging Host 的名稱
+- <path-to-your-executable>：你的可執行檔的路徑，可以絕對路徑或相對路徑，相對路徑是跟據"Native Messaging Host 的設定檔"，可以.exe 或 .py(如果有安裝 Python)
+- <your-extension-id>：你的 Chrome 擴充功能 ID
+
+1. 設定 registry
+   - 將以下內容儲存成.json，並放在 <route-to-native-messaging-host.json>
+   - 將 `<your-extension-id>` 替換為你的 Chrome 擴展 ID
+
+```json
+{
+    "name": "<com.mycompany.exelauncher>",
+    "description": "Native messaging host for ExeLauncher",
+    "path": "<path-to-your-executable>",
+    "type": "stdio",
+    "allowed_origins": [
+        "chrome-extension://<your-extension-id>/"
+    ]
+}
+```
+
+2. 設定 registry
+   - 將以下內容儲存為 `隨便.reg`，並執行以新增到 Windows Registry 中
+
+```reg
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\<com.mycompany.exelauncher>]
+@="<route-to-native-messaging-host.json>"
+```
+
+修改 reg name (wrongName 改成 correctName) 的方法
+```reg
+Windows Registry Editor Version 5.00
+
+Windows Registry Editor Version 5.00
+
+[-HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\wrongName]
+
+[HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\correctName]
+@="<route-to-native-messaging-host.json>"
+```
+
+3. <path-to-your-executable> python範例
+```python
+import sys
+import struct
+import json
+import subprocess
+
+def read_message():
+    raw_length = sys.stdin.buffer.read(4)
+    if len(raw_length) == 0:
+        sys.exit(0)
+    message_length = struct.unpack('=I', raw_length)[0]
+    message = sys.stdin.buffer.read(message_length).decode('utf-8')
+    return json.loads(message)
+
+def send_message(message):
+    encoded = json.dumps(message).encode('utf-8')
+    sys.stdout.buffer.write(struct.pack('=I', len(encoded)))
+    sys.stdout.buffer.write(encoded)
+    sys.stdout.buffer.flush()
+
+def main():
+    message = read_message()
+    if message.get("command") == "run":
+        subprocess.Popen(["notepad.exe"])
+        send_message({"status": "executed"})
+    else:
+        send_message({"status": "unknown command"})
+
+if __name__ == "__main__":
+    main()
+```
