@@ -176,6 +176,15 @@ tabStore.domains["forum.gamer.com.tw"] = {
     }
 }
 
+tabStore.domains["www.instagram.com"] = {
+    script: (tab) => {
+        const s = setInterval(() => {
+            // 移除阻擋右鍵存圖
+            [...document.querySelectorAll("._aagw")].forEach(e => e.remove())
+        }, 200);
+    }
+}
+
 // export chatGPT as image
 export const exportChatGPTConversation = () => {
     // div: @thread-xl/thread:pt-header-height mt-1.5 flex flex-col text-sm
