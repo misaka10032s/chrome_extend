@@ -121,7 +121,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.scripting.registerContentScripts([
     {
       id: "overrideOnCopyAndPaste",
-      matches: ["<all_urls>"],
+      matches: ["https://www.dailydaily-up.com/*"],
       js: ["static/js/antiPreventCopy.js"],
       runAt: "document_start"
     }
