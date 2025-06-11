@@ -116,3 +116,14 @@ for(const [key, value] of Object.entries(omniboxCallback)){
 //     ]);
 //     chrome.omnibox.setDefaultSuggestion({ description: "Error fetching conversion rate." });
 // });
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.scripting.registerContentScripts([
+    {
+      id: "overrideOnCopyAndPaste",
+      matches: ["<all_urls>"],
+      js: ["static/js/antiPreventCopy.js"],
+      runAt: "document_start"
+    }
+  ]);
+});
